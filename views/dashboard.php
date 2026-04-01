@@ -102,6 +102,7 @@ $persen_keluar = $total_transaksi > 0 ? round(($barang_keluar / $total_transaksi
             position: fixed;
             height: 100vh;
             box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
         }
 
         .sidebar-header {
@@ -202,6 +203,10 @@ $persen_keluar = $total_transaksi > 0 ? round(($barang_keluar / $total_transaksi
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
             margin-bottom: 20px;
             border-left: 4px solid;
+            transition: transform 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
         }
 
         .stat-card.total {
@@ -252,7 +257,7 @@ $persen_keluar = $total_transaksi > 0 ? round(($barang_keluar / $total_transaksi
         }
 
         .chart-container {
-            height: 300px;
+            height: 380px;
             position: relative;
         }
 
@@ -273,6 +278,7 @@ $persen_keluar = $total_transaksi > 0 ? round(($barang_keluar / $total_transaksi
 
         .progress {
             height: 8px;
+            border-radius: 4px;
         }
 
         @media (max-width: 768px) {
@@ -361,59 +367,14 @@ $persen_keluar = $total_transaksi > 0 ? round(($barang_keluar / $total_transaksi
             </div>
         </div>
 
-        <!-- Chart Section -->
-        <div class="row mb-4">
-            <div class="col-md-8">
-                <div class="chart-section">
-                    <div class="card-header">
-                        <h5><i class="fas fa-chart-pie me-2"></i>Distribusi Transaksi Tahun <?= date('Y'); ?></h5>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="chart-container">
-                                <canvas id="donutChart"></canvas>
-                                <div class="text-center mt-3">
-                                    <h4><?= number_format($total_transaksi); ?></h4>
-                                    <small class="text-muted">Total Transaksi</small>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mt-4">
-                                <div class="mb-4">
-                                    <div class="d-flex align-items-center mb-2">
-                                        <div class="rounded-circle bg-success me-2" style="width: 15px; height: 15px;"></div>
-                                        <h6 class="mb-0">Barang Masuk</h6>
-                                    </div>
-                                    <div class="ms-4">
-                                        <h4 class="text-success"><?= number_format($barang_masuk); ?></h4>
-                                        <div class="progress">
-                                            <div class="progress-bar bg-success" style="width: <?= $persen_masuk; ?>%"></div>
-                                        </div>
-                                        <small class="text-muted"><?= $persen_masuk; ?>%</small>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <div class="d-flex align-items-center mb-2">
-                                        <div class="rounded-circle bg-danger me-2" style="width: 15px; height: 15px;"></div>
-                                        <h6 class="mb-0">Barang Keluar</h6>
-                                    </div>
-                                    <div class="ms-4">
-                                        <h4 class="text-danger"><?= number_format($barang_keluar); ?></h4>
-                                        <div class="progress">
-                                            <div class="progress-bar bg-danger" style="width: <?= $persen_keluar; ?>%"></div>
-                                        </div>
-                                        <small class="text-muted"><?= $persen_keluar; ?>%</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <!-- Single Chart Section - Bar Chart -->
+        <div class="chart-section">
+            <div class="card-header">
+                <h5><i class="fas fa-chart-bar me-2"></i>Grafik Transaksi Bulanan <?= date('Y'); ?></h5>
             </div>
-
-        
+            <div class="chart-container">
+                <canvas id="barChart"></canvas>
+            </div>
         </div>
 
         <!-- Table Section -->
@@ -429,7 +390,7 @@ $persen_keluar = $total_transaksi > 0 ? round(($barang_keluar / $total_transaksi
                             <th>Barang Masuk</th>
                             <th>Barang Keluar</th>
                             <th>Selisih</th>
-                            <th>Persentase</th>
+                            <th>Persentase Masuk</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -446,18 +407,17 @@ $persen_keluar = $total_transaksi > 0 ? round(($barang_keluar / $total_transaksi
                             $total_keluar += $keluar;
                         ?>
                             <tr>
-                                <td><strong><?= $bulan; ?></strong></td>
+                                <td class="text-center"><strong><?= $bulan; ?></strong></td>
                                 <td class="text-success fw-bold text-center"><?= number_format($masuk); ?></td>
                                 <td class="text-danger fw-bold text-center"><?= number_format($keluar); ?></td>
                                 <td class="<?= $selisih >= 0 ? 'text-success' : 'text-danger'; ?> fw-bold text-center">
                                     <?= ($selisih >= 0 ? '+' : '') . number_format($selisih); ?>
                                 </td>
-                                <td>
+                                <td style="width: 200px;">
                                     <div class="d-flex align-items-center">
-                                        <div class="me-2" style="width: 50px;"><?= $persen_masuk_bulan; ?>%</div>
+                                        <div class="me-2" style="min-width: 45px;"><?= $persen_masuk_bulan; ?>%</div>
                                         <div class="progress flex-grow-1">
                                             <div class="progress-bar bg-success" style="width: <?= $persen_masuk_bulan; ?>%"></div>
-                                            <div class="progress-bar bg-danger" style="width: <?= 100 - $persen_masuk_bulan; ?>%"></div>
                                         </div>
                                     </div>
                                 </td>
@@ -465,7 +425,7 @@ $persen_keluar = $total_transaksi > 0 ? round(($barang_keluar / $total_transaksi
                         <?php endforeach; ?>
                         <!-- Total Row -->
                         <tr class="table-active fw-bold">
-                            <td>TOTAL</td>
+                            <td class="text-center">TOTAL</td>
                             <td class="text-center"><?= number_format($total_masuk); ?></td>
                             <td class="text-center"><?= number_format($total_keluar); ?></td>
                             <td class="<?= ($total_masuk - $total_keluar) >= 0 ? 'text-success' : 'text-danger'; ?> text-center">
@@ -486,39 +446,124 @@ $persen_keluar = $total_transaksi > 0 ? round(($barang_keluar / $total_transaksi
     </div>
 
     <script>
-        // Grafik Donat
-        const donutCtx = document.getElementById('donutChart').getContext('2d');
-        const donutChart = new Chart(donutCtx, {
-            type: 'doughnut',
+        // Single Bar Chart for Monthly Data - Clean and Professional
+        const barCtx = document.getElementById('barChart').getContext('2d');
+        const barChart = new Chart(barCtx, {
+            type: 'bar',
             data: {
-                labels: ['Barang Masuk', 'Barang Keluar'],
-                datasets: [{
-                    data: [<?= $barang_masuk; ?>, <?= $barang_keluar; ?>],
-                    backgroundColor: ['#2ecc71', '#e74c3c'],
-                    borderColor: ['#27ae60', '#c0392b'],
-                    borderWidth: 2,
-                }]
+                labels: <?= json_encode($chart_labels); ?>,
+                datasets: [
+                    {
+                        label: 'Barang Masuk',
+                        data: <?= json_encode($chart_masuk); ?>,
+                        backgroundColor: 'rgba(46, 204, 113, 0.8)',
+                        borderColor: '#27ae60',
+                        borderWidth: 1,
+                        borderRadius: 8,
+                        barPercentage: 0.65,
+                        categoryPercentage: 0.8
+                    },
+                    {
+                        label: 'Barang Keluar',
+                        data: <?= json_encode($chart_keluar); ?>,
+                        backgroundColor: 'rgba(231, 76, 60, 0.8)',
+                        borderColor: '#c0392b',
+                        borderWidth: 1,
+                        borderRadius: 8,
+                        barPercentage: 0.65,
+                        categoryPercentage: 0.8
+                    }
+                ]
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false,
+                maintainAspectRatio: true,
                 plugins: {
                     legend: {
-                        display: true,
-                        position: 'bottom'
+                        position: 'top',
+                        labels: {
+                            usePointStyle: true,
+                            boxWidth: 12,
+                            padding: 15,
+                            font: {
+                                size: 13,
+                                weight: 'bold'
+                            }
+                        }
                     },
                     tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                        titleFont: {
+                            size: 13,
+                            weight: 'bold'
+                        },
+                        bodyFont: {
+                            size: 12
+                        },
                         callbacks: {
                             label: function(context) {
-                                const total = <?= $total_transaksi; ?>;
-                                const value = context.raw;
-                                const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
-                                return context.label + ': ' + value.toLocaleString() + ' (' + percentage + '%)';
+                                let label = context.dataset.label || '';
+                                let value = context.raw;
+                                return label + ': ' + value.toLocaleString() + ' item';
                             }
                         }
                     }
                 },
-                cutout: '60%'
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Jumlah Barang',
+                            font: {
+                                weight: 'bold',
+                                size: 13
+                            }
+                        },
+                        grid: {
+                            color: '#e9ecef',
+                            drawBorder: true
+                        },
+                        ticks: {
+                            stepSize: 1,
+                            callback: function(value) {
+                                return value.toLocaleString();
+                            }
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Bulan',
+                            font: {
+                                weight: 'bold',
+                                size: 13
+                            }
+                        },
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            font: {
+                                size: 11
+                            }
+                        }
+                    }
+                },
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                layout: {
+                    padding: {
+                        left: 10,
+                        right: 10,
+                        top: 10,
+                        bottom: 10
+                    }
+                }
             }
         });
     </script>
